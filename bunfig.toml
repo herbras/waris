@@ -1,0 +1,12 @@
+[install]
+cache = true
+registry = "https://registry.npmjs.org/"
+
+[test]
+timeout = 30000
+coverage = false
+
+[build]
+# Build configuration
+target = "browser"
+outdir = "./dist"

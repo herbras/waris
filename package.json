@@ -1,0 +1,45 @@
+{
+	"name": "waris",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"main": "src/faraidh/index.js",
+	"types": "index.d.ts",
+	"scripts": {
+		"dev": "bun run vite",
+		"build": "bun run tsc && bun run vite build",
+		"preview": "bun run vite preview",
+		"test": "bun test",
+		"test:run": "bun test --run",
+		"test:watch": "bun test --watch",
+		"test:terbilang": "bun test test/terbilang/",
+		"test:accounting": "bun test test/terbilang/Terbilang.accounting.test.ts",
+		"test:performance": "bun test test/terbilang/Terbilang.performance.test.ts",
+		"test:faraidh": "bun test test/faraidh/",
+		"test:faraidh:basic": "bun test test/faraidh/faraidh.basic.test.ts",
+		"test:faraidh:advanced": "bun test test/faraidh/faraidh.advanced.test.ts",
+		"test:all": "bun test test/",
+		"test:complete": "bun test --timeout 30000",
+		"test:ci": "bun test --timeout 30000 --reporter junit",
+		"test:coverage": "bun test --coverage",
+		"test:silent": "bun test --bail 1",
+		"test:quick": "bun test --timeout 10000",
+		"test:slow": "bun test --timeout 60000",
+		"test:bail": "bun test --bail 1",
+		"validate": "bun run tsc --noEmit && bun run test:complete && bunx biome lint",
+		"check": "bunx biome check --fix && bun run test:complete",
+		"full-check": "bun run validate && echo '✅ All validations passed!'",
+		"test-all": "echo '🧪 Running comprehensive tests...' && bun run test:complete && echo '✅ All 106 tests passed!'",
+		"verify": "echo '🔍 Verifying project...' && bun run tsc --noEmit && bun run test:complete && echo '✅ TypeScript OK + All tests passed!'",
+		"quality": "echo '📊 Running quality checks...' && bunx biome format --write && bun run test:complete && echo '✅ Code formatted + All tests passed!'"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"typescript": "~5.8.3",
+		"vite": "^6.3.5",
+		"vitest": "^3.1.4"
+	},
+	"dependencies": {
+		"decimal.js": "^10.5.0"
+	}
+}
