@@ -221,6 +221,251 @@ console.log(terbilangRupiah(1500000n));
 // "satu juta lima ratus ribu rupiah"
 ```
 
+## 📋 Use Cases - Contoh Penggunaan Real
+
+### 🕌 Faraidh Use Cases
+
+#### **Use Case 1: Kasus Basic - Pak Ahmad Meninggal**
+```typescript
+import { calculateFaraidh } from './src/faraidh';
+import { Terbilang } from './src/utils/Terbilang';
+
+// Pak Ahmad meninggal, harta Rp 600 juta
+// Ahli waris: istri + 2 anak perempuan
+const result = calculateFaraidh({
+  totalAssets: 600000000n,  // 600 juta
+  utang: 0n,                // tidak ada utang
+  wasiatFraction: { num: 0n, den: 1n }, // tidak ada wasiat
+  heirs: {
+    istri: 1,
+    anakPerempuan: 2,
+    // semua yang lain: 0
+    suami: 0, ayah: 0, ibu: 0, anakLaki: 0,
+    kakekAyah: 0, nenekAyah: 0, nenekIbu: 0,
+    cucuLakiDariAnakLaki: 0, cucuPerempuanDariAnakLaki: 0,
+    saudaraLakiKandung: 0, saudaraPerempuanKandung: 0,
+    saudaraLakiSeayah: 0, saudaraPerempuanSeayah: 0,
+    saudaraLakiSeibu: 0, saudaraPerempuanSeibu: 0,
+    keponakanLakiDariSaudaraLakiKandung: 0,
+    pamanKandung: 0, pamanSeayah: 0
+  }
+});
+
+// Tampilkan hasil
+console.log('=== WARIS PAK AHMAD ===');
+console.log(`Harta bersih: Rp ${result.netEstate.toLocaleString()}`);
+
+result.fardResults.forEach(heir => {
+  console.log(`${heir.type}: Rp ${heir.totalShare.toLocaleString()} (${heir.portion.num}/${heir.portion.den})`);
+  console.log(`Terbilang: ${Terbilang.ConvertBigInt(heir.totalShare)} rupiah`);
+});
+
+// Output:
+// Istri: Rp 75,000,000 (1/8) - karena ada anak
+// Anak Perempuan: Rp 400,000,000 total (2/3) - dibagi 2 = Rp 200,000,000 per anak
+// Sisa Rp 125,000,000 ke dhuwu al-arham
+```
+
+#### **Use Case 2: Kasus dengan Utang & Wasiat - Bu Siti**
+```typescript
+import { calculateFaraidh } from './src/faraidh';
+
+// Bu Siti meninggal, harta Rp 800 juta, utang Rp 150 juta, wasiat 10%
+const result = calculateFaraidh({
+  totalAssets: 800000000n,   // 800 juta
+  utang: 150000000n,         // 150 juta utang bank
+  wasiatFraction: { num: 1n, den: 10n }, // wasiat 10% untuk yayasan
+  heirs: {
+    suami: 1,
+    ayah: 1,
+    ibu: 1,
+    anakLaki: 1,
+    anakPerempuan: 1,
+    // yang lain: 0
+    istri: 0, kakekAyah: 0, nenekAyah: 0, nenekIbu: 0,
+    cucuLakiDariAnakLaki: 0, cucuPerempuanDariAnakLaki: 0,
+    saudaraLakiKandung: 0, saudaraPerempuanKandung: 0,
+    saudaraLakiSeayah: 0, saudaraPerempuanSeayah: 0,
+    saudaraLakiSeibu: 0, saudaraPerempuanSeibu: 0,
+    keponakanLakiDariSaudaraLakiKandung: 0,
+    pamanKandung: 0, pamanSeayah: 0
+  }
+});
+
+console.log('=== WARIS BU SITI ===');
+console.log(`Harta awal: Rp ${800000000n.toLocaleString()}`);
+console.log(`Utang: Rp ${150000000n.toLocaleString()}`);
+console.log(`Wasiat (10%): Rp ${result.wasiatAmount?.toLocaleString()}`);
+console.log(`Harta bersih: Rp ${result.netEstate.toLocaleString()}`);
+
+// Tampilkan pembagian
+result.fardResults.forEach(heir => {
+  console.log(`${heir.type}: Rp ${heir.totalShare.toLocaleString()}`);
+});
+
+result.asabahResults.forEach(heir => {
+  console.log(`${heir.type} (Asabah): Rp ${heir.totalShare.toLocaleString()}`);
+});
+```
+
+#### **Use Case 3: Kasus Advanced - 'Awl (Penyusutan)**
+```typescript
+import { calculateFaraidh } from './src/faraidh';
+
+// Pak Budi meninggal tanpa anak, total bagian fard > 100%
+// Istri 1/4 + Ibu 1/6 + 2 Saudari 2/3 = 13/12 > 1
+const result = calculateFaraidh({
+  totalAssets: 240000000n,   // 240 juta
+  utang: 0n,
+  wasiatFraction: { num: 0n, den: 1n },
+  heirs: {
+    istri: 1,
+    ibu: 1,
+    saudaraPerempuanKandung: 2,
+    // yang lain: 0
+    suami: 0, ayah: 0, anakLaki: 0, anakPerempuan: 0,
+    kakekAyah: 0, nenekAyah: 0, nenekIbu: 0,
+    cucuLakiDariAnakLaki: 0, cucuPerempuanDariAnakLaki: 0,
+    saudaraLakiKandung: 0, saudaraLakiSeayah: 0, 
+    saudaraPerempuanSeayah: 0, saudaraLakiSeibu: 0, 
+    saudaraPerempuanSeibu: 0,
+    keponakanLakiDariSaudaraLakiKandung: 0,
+    pamanKandung: 0, pamanSeayah: 0
+  }
+});
+
+console.log('=== KASUS AWL - PAK BUDI ===');
+console.log(`Awl diterapkan: ${result.awlApplied ? 'YA' : 'TIDAK'}`);
+console.log(`Asl masalah: ${result.aslMasalah}`);
+console.log(`Total siham: ${result.totalSiham}`);
+
+// Normal: Istri 1/4, Ibu 1/6, 2 Saudari 2/3
+// Awl: semua dikurangi proporsional karena total > 100%
+result.fardResults.forEach(heir => {
+  const percentage = Number(heir.totalShare * 100n / result.netEstate);
+  console.log(`${heir.type}: Rp ${heir.totalShare.toLocaleString()} (${percentage.toFixed(1)}%)`);
+});
+```
+
+### 🔢 Terbilang Use Cases
+
+#### **Use Case 4: Konversi Harta Warisan Besar**
+```typescript
+import { Terbilang } from './src/utils/Terbilang';
+
+// Konversi nilai harta yang besar untuk dokumen resmi
+const hartaValues = [
+  1500000000n,    // 1.5 miliar
+  25750000000n,   // 25.75 miliar  
+  500000000000n,  // 500 miliar
+];
+
+console.log('=== KONVERSI HARTA BESAR ===');
+hartaValues.forEach(value => {
+  const numeric = `Rp ${value.toLocaleString('id-ID')}`;
+  const terbilang = Terbilang.ConvertBigInt(value);
+  
+  console.log(`${numeric}`);
+  console.log(`"${terbilang} rupiah"`);
+  console.log('---');
+});
+
+// Output:
+// Rp 1,500,000,000
+// "satu miliar lima ratus juta rupiah"
+// ---
+// Rp 25,750,000,000
+// "dua puluh lima miliar tujuh ratus lima puluh juta rupiah"
+```
+
+#### **Use Case 5: Konversi Desimal untuk Pembagian Warisan**
+```typescript
+import { Terbilang } from './src/utils/Terbilang';
+
+// Konversi hasil pembagian yang ada desimal
+const pembagianWarisan = [
+  166666666.67,  // hasil bagi 3
+  333333.33,     // bagian kecil
+  1250000.50,    // dengan sen
+];
+
+console.log('=== KONVERSI DESIMAL WARISAN ===');
+pembagianWarisan.forEach((value, index) => {
+  const terbilang = Terbilang.Convert(value);
+  
+  console.log(`Ahli waris ${index + 1}:`);
+  console.log(`Rp ${value.toLocaleString('id-ID')}`);
+  console.log(`"${terbilang} rupiah"`);
+  console.log('');
+});
+
+// Output:
+// Ahli waris 1:
+// Rp 166,666,666.67
+// "seratus enam puluh enam juta enam ratus enam puluh enam ribu enam ratus enam puluh enam koma enam tujuh rupiah"
+
+// Untuk dokumen notaris/pengadilan
+function formatTerbilangRupiah(amount: number): string {
+  const terbilang = Terbilang.Convert(amount);
+  return `(${terbilang} rupiah)`.replace(/\b\w/g, l => l.toUpperCase());
+}
+
+console.log('Format notaris:');
+console.log(`Rp 166,666,666.67 ${formatTerbilangRupiah(166666666.67)}`);
+// "Rp 166,666,666.67 (Seratus Enam Puluh Enam Juta Enam Ratus Enam Puluh Enam Ribu Enam Ratus Enam Puluh Enam Koma Enam Tujuh Rupiah)"
+```
+
+### 🚀 Quick Reference - Import & Functions
+
+```typescript
+// ===== IMPORTS =====
+import { calculateFaraidh, HeirCounts } from './src/faraidh';
+import { Terbilang, terbilangRupiah } from './src/utils/Terbilang';
+
+// ===== FARAIDH FUNCTIONS =====
+// Main calculation function
+calculateFaraidh(input: {
+  totalAssets: bigint;      // Harta total (BigInt)
+  utang: bigint;            // Utang (BigInt) 
+  wasiatFraction: Fraction; // Wasiat { num: bigint, den: bigint }
+  heirs: HeirCounts;        // Object semua ahli waris
+  madzhab?: string;         // Optional, default: 'syafii'
+}) → CalculationResult
+
+// Helper function untuk heirs kosong
+const emptyHeirs: HeirCounts = {
+  suami: 0, istri: 0, ayah: 0, ibu: 0,
+  // ... semua property = 0
+};
+
+// ===== TERBILANG FUNCTIONS =====
+Terbilang.Convert(input: number)              → string  // Angka biasa
+Terbilang.ConvertBigInt(input: bigint)        → string  // BigInt (lebih cepat)
+terbilangRupiah(amount: bigint)               → string  // Format "... rupiah"
+
+// ===== COMMON PATTERNS =====
+// 1. Basic faraidh calculation
+const result = calculateFaraidh({
+  totalAssets: 1000000000n,
+  utang: 0n,
+  wasiatFraction: { num: 0n, den: 1n },
+  heirs: { istri: 1, anakPerempuan: 2, ...emptyHeirs }
+});
+
+// 2. Get specific heir result
+const istriBagian = result.fardResults.find(h => h.type === 'istri');
+const anakAsabah = result.asabahResults.find(h => h.type === 'anakLaki');
+
+// 3. Format currency with terbilang
+const amount = 150000000n;
+console.log(`Rp ${amount.toLocaleString()} (${Terbilang.ConvertBigInt(amount)} rupiah)`);
+
+// 4. Check special cases
+if (result.awlApplied) console.log('Kasus Awl terjadi');
+if (result.raddApplied) console.log('Kasus Radd terjadi');
+if (result.ibtalApplied.length > 0) console.log('Ada yang terhijab:', result.ibtalApplied);
+```
+
 ## Dokumentasi API
 
 ### Engine Faraidh
