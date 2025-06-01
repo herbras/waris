@@ -5,11 +5,11 @@
       "name": "waris",
       "dependencies": {
         "decimal.js": "^10.5.0",
-        "husky": "^9.1.7",
       },
       "devDependencies": {
         "@biomejs/biome": "1.9.4",
         "@microsoft/api-extractor": "^7.52.8",
+        "husky": "^9.1.7",
         "typescript": "~5.8.3",
         "vite": "^6.3.5",
         "vite-plugin-dts": "4.5.4",
