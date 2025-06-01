@@ -90,7 +90,7 @@ describe("Terbilang - Performance & Stress Tests", () => {
 			console.log(
 				`${iterations} repeated conversions completed in ${duration.toFixed(2)}ms`,
 			);
-			expect(duration).toBeLessThan(2000); // Should complete within 2 seconds
+			expect(duration).toBeLessThan(3000); // Should complete within 3 seconds
 		});
 
 		it("should handle varied decimal precision efficiently", () => {

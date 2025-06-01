@@ -59,6 +59,38 @@ describe("Faraidh Basic Calculations", () => {
 				"suami dan istri bersamaan",
 			);
 		});
+
+		it("should throw error for more than 4 wives", () => {
+			const heirs = createEmptyHeirs();
+			heirs.istri = 5; // More than allowed
+
+			const input: CalculationInput = {
+				totalAssets: 1000000n,
+				utang: 0n,
+				wasiatFraction: { num: 0n, den: 1n },
+				heirs,
+			};
+
+			expect(() => calculateFaraidh(input)).toThrow(
+				"Jumlah istri harus antara 0 sampai 4",
+			);
+		});
+
+		it("should accept valid number of wives (1-4)", () => {
+			for (let wiveCount = 1; wiveCount <= 4; wiveCount++) {
+				const heirs = createEmptyHeirs();
+				heirs.istri = wiveCount;
+
+				const input: CalculationInput = {
+					totalAssets: 1000000n,
+					utang: 0n,
+					wasiatFraction: { num: 0n, den: 1n },
+					heirs,
+				};
+
+				expect(() => calculateFaraidh(input)).not.toThrow();
+			}
+		});
 	});
 
 	describe("Simple Inheritance Cases", () => {
@@ -81,6 +113,55 @@ describe("Faraidh Basic Calculations", () => {
 			expect(result.fardResults[0].totalShare).toBe(100000000n);
 			expect(result.raddApplied).toBe(true);
 			expect(result.totalDistributed).toBe(100000000n);
+		});
+
+		it("should calculate inheritance for multiple wives (up to 4)", () => {
+			const heirs = createEmptyHeirs();
+			heirs.istri = 3; // 3 wives
+
+			const input: CalculationInput = {
+				totalAssets: 120000000n, // 120 million
+				utang: 0n,
+				wasiatFraction: { num: 0n, den: 1n },
+				heirs,
+			};
+
+			const result = calculateFaraidh(input);
+
+			expect(result.fardResults).toHaveLength(1);
+			expect(result.fardResults[0].type).toBe("istri");
+			expect(result.fardResults[0].count).toBe(3); // 3 wives
+			// 3 wives share 1/4 collectively + remaining 3/4 via radd = 120M total
+			expect(result.fardResults[0].totalShare).toBe(120000000n);
+			expect(result.fardResults[0].individualShare).toBe(40000000n); // 120M / 3 = 40M each
+			expect(result.raddApplied).toBe(true);
+			expect(result.totalDistributed).toBe(120000000n);
+		});
+
+		it("should calculate inheritance for 4 wives with children", () => {
+			const heirs = createEmptyHeirs();
+			heirs.istri = 4; // Maximum 4 wives
+			heirs.anakLaki = 2; // 2 sons
+
+			const input: CalculationInput = {
+				totalAssets: 160000000n, // 160 million
+				utang: 0n,
+				wasiatFraction: { num: 0n, den: 1n },
+				heirs,
+			};
+
+			const result = calculateFaraidh(input);
+
+			// 4 wives get 1/8 when there are children (20M total, 5M each)
+			const wivesResult = result.fardResults.find((r) => r.type === "istri");
+			expect(wivesResult?.count).toBe(4);
+			expect(wivesResult?.totalShare).toBe(20000000n); // 1/8 of 160M
+			expect(wivesResult?.individualShare).toBe(5000000n); // 20M / 4 = 5M each
+			expect(wivesResult?.portion).toEqual({ num: 1n, den: 8n });
+
+			// Sons get the rest as asabah
+			const sonsResult = result.asabahResults.find((r) => r.type === "anakLaki");
+			expect(sonsResult?.totalShare).toBe(140000000n); // 7/8 of 160M
 		});
 
 		it("should calculate inheritance for husband only", () => {
