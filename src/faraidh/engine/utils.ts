@@ -117,8 +117,8 @@ export function sumShares(results: Array<{ totalShare: bigint }>): bigint {
 export function validateHeirCounts(heirs: HeirCounts): ValidationError[] {
 	const errors: ValidationError[] = [];
 
-	// Cannot have both husband and wife
-	if (heirs.suami === 1 && heirs.istri === 1) {
+	// Cannot have both husband and wives
+	if (heirs.suami === 1 && heirs.istri > 0) {
 		errors.push({
 			field: "heirs",
 			message: "Tidak boleh ada suami dan istri bersamaan",
@@ -141,7 +141,6 @@ export function validateHeirCounts(heirs: HeirCounts): ValidationError[] {
 	// Validate ZeroOne fields
 	const zeroOneFields: (keyof HeirCounts)[] = [
 		"suami",
-		"istri",
 		"ayah",
 		"ibu",
 		"kakekAyah",
@@ -158,6 +157,15 @@ export function validateHeirCounts(heirs: HeirCounts): ValidationError[] {
 				code: "INVALID_ZERO_ONE_VALUE",
 			});
 		}
+	}
+
+	// Validate istri field (0-4)
+	if (heirs.istri < 0 || heirs.istri > 4) {
+		errors.push({
+			field: "heirs.istri",
+			message: "Jumlah istri harus antara 0 sampai 4",
+			code: "INVALID_ISTRI_COUNT",
+		});
 	}
 
 	return errors;

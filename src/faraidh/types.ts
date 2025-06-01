@@ -9,7 +9,7 @@ export type ZeroOne = 0 | 1;
 export interface HeirCounts {
 	// Pasangan (Spouse)
 	suami: ZeroOne; // 0|1
-	istri: ZeroOne; // 0|1
+	istri: number; // 0-4 (up to 4 wives allowed in Islam)
 
 	// Orang Tua (Parents)
 	ayah: ZeroOne; // 0|1

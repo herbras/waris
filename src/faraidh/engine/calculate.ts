@@ -267,7 +267,7 @@ function calculateFardShares(
 	}
 
 	// SPOUSE (suami/istri)
-	if (heirs.istri === 1) {
+	if (heirs.istri > 0) {
 		const hasChild =
 			heirs.anakLaki +
 				heirs.anakPerempuan +
@@ -277,7 +277,7 @@ function calculateFardShares(
 		const fraction = hasChild
 			? reduceFraction({ num: 1n, den: 8n })
 			: reduceFraction({ num: 1n, den: 4n });
-		addFardResult("istri", 1, fraction);
+		addFardResult("istri", heirs.istri, fraction);
 	}
 
 	if (heirs.suami === 1) {
