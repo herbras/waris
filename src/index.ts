@@ -2,7 +2,7 @@
  * Waris - Islamic Inheritance Calculator & Indonesian Number Converter
  * 
  * @version 1.0.0
- * @author Waris Team
+ * @author Ibrahim Nurul Huda
  * @license MIT
  */
 

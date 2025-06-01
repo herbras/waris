@@ -31,16 +31,20 @@
 		"syafii",
 		"madzhab"
 	],
-	"author": "Waris Team",
+	"author": {
+		"name": "Ibrahim Nurul Huda",
+		"email": "ibrahim@sarbeh.com",
+		"url": "https://github.com/herbras"
+	},
 	"license": "MIT",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/your-username/waris.git"
+		"url": "https://github.com/herbras/waris.git"
 	},
 	"bugs": {
-		"url": "https://github.com/your-username/waris/issues"
+		"url": "https://github.com/herbras/waris/issues"
 	},
-	"homepage": "https://github.com/your-username/waris#readme",
+	"homepage": "https://github.com/herbras/waris#readme",
 	"scripts": {
 		"dev": "bun run vite",
 		"build": "bun run clean && bun run vite build",

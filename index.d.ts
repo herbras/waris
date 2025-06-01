@@ -4,8 +4,8 @@
  * Complete TypeScript definitions for the Waris (Islamic inheritance) library
  * Includes faraidh calculations and Indonesian number-to-words conversion
  *
- * @version 0.0.0
- * @author Waris Development Team
+ * @version 1.0.0
+ * @author Ibrahim Nurul Huda <ibrahim@sarbeh.com>
  * @license MIT
  */
 
