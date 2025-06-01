@@ -82,9 +82,12 @@
 		"test-all": "echo '🧪 Running comprehensive tests...' && bun run test:complete && echo '✅ All 118 tests passed!'",
 		"verify": "echo '🔍 Verifying project...' && bun x tsc --noEmit && bun run test:complete && echo '✅ TypeScript OK + All tests passed!'",
 		"quality": "echo '📊 Running quality checks...' && bunx biome format --write && bun run test:complete && echo '✅ Code formatted + All tests passed!'",
+		"pre-commit": "echo '🚀 Pre-commit validation...' && bun run test:complete && echo '✅ Source tests passed!' && bun run build && echo '✅ Build completed!' && bun run test:dist:all && echo '🎉 All pre-commit checks passed!'",
+		"commit-ready": "echo '📋 Checking commit readiness...' && bun run pre-commit",
 		"size": "bun run build && bun run --shell \"du -sh dist/*\"",
 		"analyze": "bun run build && bunx vite-bundle-analyzer dist",
-		"release": "bun run build && npm publish"
+		"release": "bun run build && npm publish",
+		"prepare": "husky"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -95,7 +98,8 @@
 		"vitest": "^3.1.4"
 	},
 	"dependencies": {
-		"decimal.js": "^10.5.0"
+		"decimal.js": "^10.5.0",
+		"husky": "^9.1.7"
 	},
 	"engines": {
 		"node": ">=18.0.0"

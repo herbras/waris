@@ -13,16 +13,16 @@ export default defineConfig({
 			clearPureImport: true,
 			outDir: "dist",
 			copyDtsFiles: false,
-			
+
 			afterBuild: (emittedFiles) => {
 				console.log(`📝 Generated ${emittedFiles.size} declaration files`);
-				
+
 				const requiredFiles = [
 					'index.d.ts',
-					'faraidh/types.d.ts', 
+					'faraidh/types.d.ts',
 					'utils/Terbilang.d.ts'
 				];
-				
+
 				for (const file of requiredFiles) {
 					if (!emittedFiles.has(file)) {
 						console.warn(`⚠️  Missing: ${file}`);
@@ -33,7 +33,7 @@ export default defineConfig({
 			},
 		}),
 	],
-	
+
 	build: {
 		lib: {
 			entry: "./src/index.ts",
@@ -53,7 +53,7 @@ export default defineConfig({
 			},
 		},
 		rollupOptions: {
-			external: () => false, // Bundle everything for all formats
+			external: () => false,
 			output: {
 				globals: {},
 				exports: "named",
@@ -64,7 +64,7 @@ export default defineConfig({
 		target: "es2020",
 		reportCompressedSize: true,
 	},
-	
+
 	resolve: {
 		alias: {
 			"@": "./src",
