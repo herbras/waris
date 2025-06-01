@@ -1,13 +1,927 @@
 <!doctype html>
-<html lang="en">
-  <head>
+<html lang="id">
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕌</text></svg>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
-</html>
+    <title>Waris - Demo (UMD)</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- UMD Build - No CORS issues -->
+    <script src="./dist/waris.umd.js"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-green-50 to-blue-50 min-h-screen">
+    <div id="app" x-data="warisDemo()" x-cloak>
+        <!-- Header -->
+        <header class="bg-white shadow-lg border-b-4 border-green-500">
+            <div class="max-w-6xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="text-4xl">🕌</div>
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900">Waris Demo</h1>
+                            <p class="text-gray-600">Islamic Inheritance Calculator & Indonesian Number Converter</p>
+                        </div>
+                    </div>
+                    <div class="bg-green-100 px-4 py-2 rounded-lg">
+                        <div class="text-sm text-green-700 font-medium">Tests Passed</div>
+                        <div class="text-2xl font-bold text-green-800">124/124 ✅</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-6xl mx-auto px-4">
+                <div class="flex space-x-8">
+                    <button @click="activeTab = 'waris'" 
+                            :class="activeTab === 'waris' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500'"
+                            class="py-4 px-1 border-b-2 font-medium text-sm">
+                        🏛️ Waris Engine
+                    </button>
+                    <button @click="activeTab = 'terbilang'" 
+                            :class="activeTab === 'terbilang' ? 'border-green-500 text-green-600' : 'border-transparent text-gray-500'"
+                            class="py-4 px-1 border-b-2 font-medium text-sm">
+                        🔢 Terbilang Engine
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Content -->
+        <main class="max-w-6xl mx-auto px-4 py-8">
+            
+            <!-- Waris Tab -->
+            <div x-show="activeTab === 'waris'" class="space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">🏛️ Islamic Inheritance Calculator</h2>
+                    
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- Input Form -->
+                        <div class="space-y-4">
+                            <div class="bg-green-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-green-800 mb-3">📊 Informasi Harta</h3>
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Total Harta (Rp)</label>
+                                        <input type="number" x-model="warisInput.totalAssets" 
+                                               class="w-full px-3 py-2 border rounded-md"
+                                               placeholder="1000000000">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Utang (Rp)</label>
+                                        <input type="number" x-model="warisInput.debt" 
+                                               class="w-full px-3 py-2 border rounded-md"
+                                               placeholder="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium mb-1">Wasiat (%)</label>
+                                        <input type="number" x-model="warisInput.wasiatPercent" min="0" max="33.33" step="0.01"
+                                               class="w-full px-3 py-2 border rounded-md"
+                                               placeholder="0">
+                                        <div class="text-xs text-gray-500 mt-1">Maksimal 33.33% (1/3) dari sisa harta setelah utang</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-3">👥 Ahli Waris</h3>
+                                
+                                <!-- Spouses -->
+                                <div class="mb-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">💒 Pasangan</h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Suami (0-1)</label>
+                                            <input type="number" x-model.number="warisInput.heirs.suami" min="0" max="1"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Istri (0-4)</label>
+                                            <input type="number" x-model.number="warisInput.heirs.istri" min="0" max="4"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Parents & Grandparents -->
+                                <div class="mb-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">👨‍👩‍👦 Orang Tua & Kakek Nenek</h4>
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Ayah</label>
+                                            <input type="number" x-model.number="warisInput.heirs.ayah" min="0" max="1"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Ibu</label>
+                                            <input type="number" x-model.number="warisInput.heirs.ibu" min="0" max="1"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Kakek Ayah</label>
+                                            <input type="number" x-model.number="warisInput.heirs.kakekAyah" min="0" max="1"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Nenek Ayah</label>
+                                            <input type="number" x-model.number="warisInput.heirs.nenekAyah" min="0" max="1"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Nenek Ibu</label>
+                                            <input type="number" x-model.number="warisInput.heirs.nenekIbu" min="0" max="1"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Children -->
+                                <div class="mb-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">👶 Anak & Cucu</h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Anak Laki-laki</label>
+                                            <input type="number" x-model.number="warisInput.heirs.anakLaki" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Anak Perempuan</label>
+                                            <input type="number" x-model.number="warisInput.heirs.anakPerempuan" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Cucu Laki dari Anak Laki</label>
+                                            <input type="number" x-model.number="warisInput.heirs.cucuLakiDariAnakLaki" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Cucu Perempuan dari Anak Laki</label>
+                                            <input type="number" x-model.number="warisInput.heirs.cucuPerempuanDariAnakLaki" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Siblings -->
+                                <div class="mb-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">👫 Saudara Kandung</h4>
+                                    <div class="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Saudara Laki Kandung</label>
+                                            <input type="number" x-model.number="warisInput.heirs.saudaraLakiKandung" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Saudara Perempuan Kandung</label>
+                                            <input type="number" x-model.number="warisInput.heirs.saudaraPerempuanKandung" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Saudara Laki Seayah</label>
+                                            <input type="number" x-model.number="warisInput.heirs.saudaraLakiSeayah" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Saudara Perempuan Seayah</label>
+                                            <input type="number" x-model.number="warisInput.heirs.saudaraPerempuanSeayah" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Saudara Laki Seibu</label>
+                                            <input type="number" x-model.number="warisInput.heirs.saudaraLakiSeibu" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Saudara Perempuan Seibu</label>
+                                            <input type="number" x-model.number="warisInput.heirs.saudaraPerempuanSeibu" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Extended Family -->
+                                <div class="mb-4">
+                                    <h4 class="font-medium text-gray-700 mb-2">👨‍👦 Keluarga Lain</h4>
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Keponakan Laki dari Saudara Laki Kandung</label>
+                                            <input type="number" x-model.number="warisInput.heirs.keponakanLakiDariSaudaraLakiKandung" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Paman Kandung</label>
+                                            <input type="number" x-model.number="warisInput.heirs.pamanKandung" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium mb-1">Paman Seayah</label>
+                                            <input type="number" x-model.number="warisInput.heirs.pamanSeayah" min="0"
+                                                   class="w-full px-3 py-2 border rounded-md">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex space-x-4">
+                                <button @click="calculateInheritance()" 
+                                        class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 font-medium transition-colors">
+                                    🧮 Hitung Warisan
+                                </button>
+                                <button @click="loadSample()" 
+                                        class="px-6 py-3 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 font-medium transition-colors">
+                                    📋 Contoh
+                                </button>
+                                <button @click="loadAwlSample()" 
+                                        class="px-6 py-3 border border-red-600 text-red-600 rounded-lg hover:bg-red-50 font-medium transition-colors">
+                                    🔥 Kasus 'Awl
+                                </button>
+                                <button @click="loadGharrawainSample()" 
+                                        class="px-6 py-3 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 font-medium transition-colors">
+                                    ⚖️ Gharrawain
+                                </button>
+                            </div>
+                            
+                            <!-- Sample Cases Section -->
+                            <div class="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                                <h4 class="font-semibold text-amber-800 mb-3">📚 Kumpulan Soal Faraidh</h4>
+                                <p class="text-sm text-amber-700 mb-4">Coba 5 soal faraidh dari basic ke advanced - simulasi kasus nyata:</p>
+                                
+                                <div class="grid grid-cols-1 gap-3">
+                                    <!-- Soal 1: Basic -->
+                                    <div class="bg-white border border-green-300 rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <div class="font-semibold text-green-700">🟢 Soal 1: Basic - Kasus Sederhana</div>
+                                                <div class="text-sm text-gray-700 mt-1">
+                                                    <strong>Pak Ahmad meninggal dunia.</strong> Meninggalkan harta Rp 600 juta (rumah + tabungan).
+                                                    Ahli waris: Istri + 2 anak perempuan. Tidak ada utang atau wasiat.
+                                                </div>
+                                                <div class="text-xs text-green-600 mt-1">
+                                                    Pelajari: Pembagian dasar Ashabul Furudh dan Asabah
+                                                </div>
+                                            </div>
+                                            <button @click="loadCase1()" 
+                                                    class="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors">
+                                                Coba
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Soal 2: Intermediate -->
+                                    <div class="bg-white border border-blue-300 rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <div class="font-semibold text-blue-700">🔵 Soal 2: Intermediate - Dengan Utang & Wasiat</div>
+                                                <div class="text-sm text-gray-700 mt-1">
+                                                    <strong>Bu Siti meninggal dunia.</strong> Harta Rp 800 juta (toko + tanah). 
+                                                    Utang bank Rp 150 juta. Wasiat 10% untuk yayasan. 
+                                                    Ahli waris: Suami + Ayah + Ibu + 1 anak laki + 1 anak perempuan.
+                                                </div>
+                                                <div class="text-xs text-blue-600 mt-1">
+                                                    Pelajari: Urutan pembayaran utang, wasiat, dan pembagian warisan
+                                                </div>
+                                            </div>
+                                            <button @click="loadCase2()" 
+                                                    class="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+                                                Coba
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Soal 3: Advanced -->
+                                    <div class="bg-white border border-orange-300 rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <div class="font-semibold text-orange-700">🟠 Soal 3: Advanced - Kasus 'Awl</div>
+                                                <div class="text-sm text-gray-700 mt-1">
+                                                    <strong>Pak Budi meninggal tanpa anak.</strong> Harta Rp 240 juta.
+                                                    Ahli waris: Istri + Ibu + 2 saudara perempuan kandung.
+                                                    Total bagian: 1/4 + 1/6 + 2/3 = 13/12 (lebih dari 100%!)
+                                                </div>
+                                                <div class="text-xs text-orange-600 mt-1">
+                                                    Pelajari: Sistem 'Awl (pengurangan proporsional) ketika total bagian > 100%
+                                                </div>
+                                            </div>
+                                            <button @click="loadCase3()" 
+                                                    class="px-4 py-2 bg-orange-600 text-white text-sm rounded-lg hover:bg-orange-700 transition-colors">
+                                                Coba
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Soal 4: Complex -->
+                                    <div class="bg-white border border-purple-300 rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <div class="font-semibold text-purple-700">🟣 Soal 4: Complex - Kasus Gharrawain</div>
+                                                <div class="text-sm text-gray-700 mt-1">
+                                                    <strong>Bu Aisyah meninggal tanpa anak.</strong> Harta Rp 360 juta.
+                                                    Ahli waris: Suami + Ibu + Ayah. 
+                                                    Kasus khusus: Ibu dapat 1/3 dari sisa (bukan 1/3 total).
+                                                </div>
+                                                <div class="text-xs text-purple-600 mt-1">
+                                                    Pelajari: Kasus Gharrawain/Umariyatain - perhitungan khusus untuk ibu
+                                                </div>
+                                            </div>
+                                            <button @click="loadCase4()" 
+                                                    class="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors">
+                                                Coba
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Soal 5: Expert -->
+                                    <div class="bg-white border border-red-300 rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div>
+                                                <div class="font-semibold text-red-700">🔴 Soal 5: Expert - Hijab Kompleks</div>
+                                                <div class="text-sm text-gray-700 mt-1">
+                                                    <strong>Pak Hasan meninggal.</strong> Harta Rp 1.2 miliar, utang Rp 200 juta, wasiat 5%.
+                                                    Ahli waris potensial: Istri + Ayah + Ibu + Kakek + Nenek + 2 anak laki + 1 anak perempuan + saudara kandung.
+                                                    <span class="text-red-600 font-medium">Banyak yang akan terhalang!</span>
+                                                </div>
+                                                <div class="text-xs text-red-600 mt-1">
+                                                    Pelajari: Sistem Hijab (penghalangan) - siapa yang terhalang oleh siapa
+                                                </div>
+                                            </div>
+                                            <button @click="loadCase5()" 
+                                                    class="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors">
+                                                Coba
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-4 p-3 bg-amber-100 border border-amber-300 rounded-lg">
+                                    <div class="text-sm text-amber-800">
+                                        💡 <strong>Tips:</strong> Klik tombol "Coba" untuk memuat data soal ke kalkulator, 
+                                        lalu klik "Hitung Warisan" untuk melihat hasil perhitungan dan penjelasan detail.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results -->
+                        <div class="space-y-4">
+                            <div x-show="warisResult" class="bg-green-50 p-6 rounded-lg">
+                                <h3 class="font-semibold text-green-800 mb-4">✅ Results</h3>
+                                
+                                <div class="space-y-3">
+                                    <!-- Estate Summary -->
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                            <div class="text-sm text-gray-600 mb-1">💰 Harta Bersih</div>
+                                            <div class="text-xl font-bold text-green-700" x-text="formatCurrency(warisResult?.netEstate)"></div>
+                                            <div class="text-xs text-gray-500 mt-1">Setelah dikurangi utang & wasiat</div>
+                                        </div>
+                                        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                            <div class="text-sm text-gray-600 mb-1">⚖️ Metode Pembagian</div>
+                                            <div class="text-xl font-bold" 
+                                                 :class="warisResult?.distributionMethod === 'awl' ? 'text-red-600' : 
+                                                         warisResult?.distributionMethod === 'radd' ? 'text-blue-600' : 'text-green-600'"
+                                                 x-text="warisResult?.distributionMethod === 'awl' ? 'AWL' :
+                                                         warisResult?.distributionMethod === 'radd' ? 'RADD' :
+                                                         warisResult?.distributionMethod === 'normal' ? 'NORMAL' :
+                                                         warisResult?.distributionMethod?.toUpperCase()"></div>
+                                            <div class="text-xs text-gray-500 mt-1"
+                                                 x-text="warisResult?.distributionMethod === 'awl' ? 'Pengurangan proporsional' :
+                                                         warisResult?.distributionMethod === 'radd' ? 'Pengembalian sisa harta' :
+                                                         'Pembagian standar'"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Special Cases Info -->
+                                    <div x-show="warisResult?.awlApplied || warisResult?.raddApplied || warisResult?.ibtalApplied?.length > 0" 
+                                         class="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 p-4 rounded-lg">
+                                        <h5 class="font-semibold text-amber-800 mb-2">📋 Keterangan Khusus</h5>
+                                        
+                                        <div x-show="warisResult?.awlApplied" class="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                            <div class="flex items-start space-x-2">
+                                                <span class="text-red-600 mt-0.5">🔥</span>
+                                                <div>
+                                                    <div class="font-semibold text-red-800">Kasus 'Awl (Pengurangan)</div>
+                                                    <div class="text-sm text-red-700 mt-1">
+                                                        Total bagian ahli waris melebihi 100% dari harta. Dilakukan pengurangan secara proporsional sesuai syariat.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div x-show="warisResult?.raddApplied" class="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                            <div class="flex items-start space-x-2">
+                                                <span class="text-blue-600 mt-0.5">📈</span>
+                                                <div>
+                                                    <div class="font-semibold text-blue-800">Kasus Radd (Pengembalian)</div>
+                                                    <div class="text-sm text-blue-700 mt-1">
+                                                        Sisa harta dikembalikan kepada ahli waris yang berhak menerimanya secara proporsional.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div x-show="warisResult?.ibtalApplied?.length > 0" class="p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                                            <div class="flex items-start space-x-2">
+                                                <span class="text-orange-600 mt-0.5">🚫</span>
+                                                <div>
+                                                    <div class="font-semibold text-orange-800">Ahli Waris Terhalang (Hijab)</div>
+                                                    <div class="text-sm text-orange-700 mt-1">
+                                                        <span class="font-medium">Yang terhalang:</span> 
+                                                        <span x-text="warisResult.ibtalApplied.map(type => getHeirDisplayName(type)).join(', ')"></span>
+                                                    </div>
+                                                    <div class="text-xs text-orange-600 mt-1">
+                                                        Terhalang karena ada ahli waris yang lebih dekat hubungannya.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div x-show="warisResult && warisResult.heirs && warisResult.heirs.length > 0">
+                                        <h4 class="font-medium mb-3 text-gray-800">👥 Pembagian Warisan</h4>
+                                        <div class="space-y-3">
+                                            <template x-for="heir in (warisResult?.heirs || [])" :key="heir.name || heir.heirType">
+                                                <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                                                    <!-- Header Info -->
+                                                    <div class="flex items-center justify-between mb-3">
+                                                        <div class="flex items-center space-x-3">
+                                                            <div class="w-10 h-10 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center">
+                                                                <span class="text-green-700 font-medium text-sm" 
+                                                                      x-text="heir.name.charAt(0)"></span>
+                                                            </div>
+                                                            <div>
+                                                                <div class="font-semibold text-gray-900" x-text="heir.name"></div>
+                                                                <div class="flex items-center space-x-2 mt-1">
+                                                                    <span x-show="heir.count > 1" 
+                                                                          class="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full border border-blue-200"
+                                                                          x-text="heir.count + ' orang'"></span>
+                                                                    <span class="text-xs px-2 py-1 rounded-full font-medium"
+                                                                          :class="heir.category === 'fard' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 
+                                                                                 heir.category === 'asabah' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 
+                                                                                 'bg-gray-50 text-gray-700 border border-gray-200'"
+                                                                          x-text="heir.category === 'fard' ? 'Bagian Tetap' : 
+                                                                                 heir.category === 'asabah' ? 'Ahli Waris Asabah' : 
+                                                                                 heir.category?.toUpperCase()"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-right">
+                                                            <div class="text-lg font-bold text-gray-900" x-text="formatCurrency(heir.amount)"></div>
+                                                            <div class="text-sm text-gray-500" x-text="heir.fraction ? 'Bagian: ' + heir.fraction : ''"></div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <!-- Detail Info -->
+                                                    <div class="border-t border-gray-100 pt-3">
+                                                        <div x-show="heir.count > 1" class="mb-2">
+                                                            <div class="text-sm text-gray-600">
+                                                                <span class="font-medium">Per orang:</span> 
+                                                                <span class="font-semibold text-green-700" x-text="formatCurrency(heir.individualShare)"></span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-sm text-gray-600 leading-relaxed">
+                                                            <span class="font-medium">Terbilang:</span> 
+                                                            <span class="italic" x-text="heir.terbilang || 'Tidak tersedia'"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        
+                                        <!-- Summary Total -->
+                                        <div class="mt-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg">
+                                            <div class="flex justify-between items-center">
+                                                <span class="font-semibold text-gray-800">Total Distribusi:</span>
+                                                <span class="text-xl font-bold text-green-700" x-text="formatCurrency(warisResult?.totalDistributed)"></span>
+                                            </div>
+                                            <div class="text-sm text-gray-600 mt-1">
+                                                Seluruh harta telah terdistribusi sesuai ketentuan syariat Islam
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div x-show="warisError" class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                                <div class="flex items-start space-x-2">
+                                    <span class="text-red-600 mt-0.5">❌</span>
+                                    <div>
+                                        <div class="font-semibold text-red-800 mb-1">Terjadi Kesalahan</div>
+                                        <div class="text-red-700 text-sm" x-text="warisError"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terbilang Tab -->
+            <div x-show="activeTab === 'terbilang'" class="space-y-6">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold mb-4">🔢 Indonesian Number Converter</h2>
+                    
+                    <div class="grid lg:grid-cols-2 gap-8">
+                        <!-- Input -->
+                        <div class="space-y-4">
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-blue-800 mb-3">💰 Number Input</h3>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Enter Number</label>
+                                    <input type="text" x-model="terbilangInput" 
+                                           @input="convertToTerbilang()"
+                                           class="w-full px-3 py-2 border rounded-md"
+                                           placeholder="123456789.50">
+                                </div>
+                            </div>
+
+                            <div class="bg-purple-50 p-4 rounded-lg">
+                                <h3 class="font-semibold text-purple-800 mb-3">🎯 Quick Examples</h3>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button @click="setExample('12345')" 
+                                            class="text-left px-3 py-2 bg-white border rounded hover:bg-purple-100">
+                                        <div class="font-medium">12,345</div>
+                                        <div class="text-xs text-gray-600">Basic</div>
+                                    </button>
+                                    <button @click="setExample('1000000000')" 
+                                            class="text-left px-3 py-2 bg-white border rounded hover:bg-purple-100">
+                                        <div class="font-medium">1 Billion</div>
+                                        <div class="text-xs text-gray-600">Large</div>
+                                    </button>
+                                    <button @click="setExample('123.456')" 
+                                            class="text-left px-3 py-2 bg-white border rounded hover:bg-purple-100">
+                                        <div class="font-medium">123.456</div>
+                                        <div class="text-xs text-gray-600">Decimal</div>
+                                    </button>
+                                    <button @click="setExample('-500000')" 
+                                            class="text-left px-3 py-2 bg-white border rounded hover:bg-purple-100">
+                                        <div class="font-medium">-500,000</div>
+                                        <div class="text-xs text-gray-600">Negative</div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results -->
+                        <div class="space-y-4">
+                            <div x-show="terbilangResult" class="bg-green-50 p-6 rounded-lg">
+                                <h3 class="font-semibold text-green-800 mb-4">✅ Conversion</h3>
+                                
+                                <div class="space-y-4">
+                                    <div class="bg-white p-4 rounded border">
+                                        <div class="text-sm text-gray-600 mb-1">Number</div>
+                                        <div class="text-xl font-mono font-bold" x-text="formatNumber(terbilangInput)"></div>
+                                    </div>
+                                    
+                                    <div class="bg-white p-4 rounded border">
+                                        <div class="text-sm text-gray-600 mb-1">Indonesian Words</div>
+                                        <div class="text-lg font-medium text-green-700 capitalize leading-relaxed" x-text="terbilangResult"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div x-show="terbilangError" class="bg-red-50 border border-red-200 p-4 rounded-lg">
+                                <div class="text-red-800" x-text="terbilangError"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Alpine.js component using UMD globals
+        window.warisDemo = () => ({
+            activeTab: 'waris',
+            
+            warisInput: {
+                totalAssets: 1000000000,
+                debt: 0,
+                wasiatPercent: 0,
+                heirs: {}
+            },
+            warisResult: null,
+            warisError: null,
+            
+            terbilangInput: '123456789.50',
+            terbilangResult: '',
+            terbilangError: null,
+            
+            init() {
+                console.log('🕌 Waris Demo initialized!');
+                console.log('Available Waris:', !!window.Waris);
+                console.log('Available Terbilang:', !!window.Waris?.Terbilang);
+                
+                // Initialize with empty heirs
+                this.warisInput.heirs = this.createEmptyHeirs();
+                // Set default sample values
+                this.warisInput.heirs.istri = 1;
+                this.warisInput.heirs.anakPerempuan = 2;
+                
+                this.convertToTerbilang();
+            },
+            
+            calculateInheritance() {
+                this.warisError = null;
+                this.warisResult = null;
+                
+                try {
+                    // Calculate wasiat fraction from percentage
+                    const wasiatPercent = this.warisInput.wasiatPercent || 0;
+                    const wasiatFraction = wasiatPercent > 0 ? 
+                        { num: BigInt(Math.round(wasiatPercent * 1000)), den: 100000n } : 
+                        { num: 0n, den: 1n };
+                    
+                    const input = {
+                        totalAssets: BigInt(this.warisInput.totalAssets || 0),
+                        utang: BigInt(this.warisInput.debt || 0),
+                        wasiatFraction: wasiatFraction,
+                        heirs: { ...this.warisInput.heirs }
+                    };
+                    
+                    const result = window.Waris.Waris.calculateFaraidh(input);
+                    console.log('Calculation result:', result);
+                    
+                    // Combine all heir results from different categories
+                    const allHeirs = [
+                        ...(result.fardResults || []),
+                        ...(result.asabahResults || []),
+                        ...(result.raddResults || []),
+                        ...(result.dhuwuResults || [])
+                    ];
+                    console.log('All heirs found:', allHeirs);
+                    
+                    this.warisResult = {
+                        ...result,
+                        heirs: allHeirs.map(heir => ({
+                            name: this.getHeirDisplayName(heir.type),
+                            type: heir.type,
+                            count: heir.count,
+                            amount: heir.totalShare,
+                            individualShare: heir.individualShare,
+                            fraction: this.formatFraction(heir.portion),
+                            category: heir.category,
+                            terbilang: this.formatTerbilang(heir.totalShare)
+                        }))
+                    };
+                } catch (error) {
+                    this.warisError = error.message;
+                }
+            },
+            
+            loadSample() {
+                // Standard sample case
+                this.warisInput = {
+                    totalAssets: 2400000000,
+                    debt: 200000000,
+                    wasiatPercent: 5, // 5% wasiat
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.istri = 1;
+                this.warisInput.heirs.ayah = 1;
+                this.warisInput.heirs.ibu = 1;
+                this.warisInput.heirs.anakPerempuan = 2;
+                this.calculateInheritance();
+            },
+            
+            loadAwlSample() {
+                // Kasus 'Awl: Istri + Ibu + 2 Saudari Kandung (90M)
+                this.warisInput = {
+                    totalAssets: 90000000,
+                    debt: 0,
+                    wasiatPercent: 0,
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.istri = 1;
+                this.warisInput.heirs.ibu = 1;
+                this.warisInput.heirs.saudaraPerempuanKandung = 2;
+                this.calculateInheritance();
+            },
+            
+            loadGharrawainSample() {
+                // Kasus Gharrawain: Suami + Ibu + Ayah (120M)
+                this.warisInput = {
+                    totalAssets: 120000000,
+                    debt: 0,
+                    wasiatPercent: 0,
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.suami = 1;
+                this.warisInput.heirs.ibu = 1;
+                this.warisInput.heirs.ayah = 1;
+                this.calculateInheritance();
+            },
+
+            // 5 Soal Faraidh dari Basic ke Advanced
+            loadCase1() {
+                // SOAL 1: BASIC - Pak Ahmad meninggal
+                // Harta: Rp 600,000,000 (rumah + tabungan)
+                // Ahli waris: Istri + 2 anak perempuan
+                // Tidak ada utang/wasiat
+                this.warisInput = {
+                    totalAssets: 600000000,
+                    debt: 0,
+                    wasiatPercent: 0,
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.istri = 1;
+                this.warisInput.heirs.anakPerempuan = 2;
+                this.calculateInheritance();
+            },
+
+            loadCase2() {
+                // SOAL 2: INTERMEDIATE - Bu Siti meninggal 
+                // Harta: Rp 800,000,000 (toko + tanah)
+                // Utang: Rp 150,000,000 (kredit bank)
+                // Wasiat: 10% untuk yayasan
+                // Ahli waris: Suami + Ayah + Ibu + 1 anak laki + 1 anak perempuan
+                this.warisInput = {
+                    totalAssets: 800000000,
+                    debt: 150000000,
+                    wasiatPercent: 10,
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.suami = 1;
+                this.warisInput.heirs.ayah = 1;
+                this.warisInput.heirs.ibu = 1;
+                this.warisInput.heirs.anakLaki = 1;
+                this.warisInput.heirs.anakPerempuan = 1;
+                this.calculateInheritance();
+            },
+
+            loadCase3() {
+                // SOAL 3: ADVANCED - Kasus 'Awl (Total bagian > 100%)
+                // Pak Budi meninggal tanpa anak
+                // Harta: Rp 240,000,000
+                // Ahli waris: Istri + Ibu + 2 saudara perempuan kandung
+                // Total bagian: 1/4 + 1/6 + 2/3 = 13/12 (> 100%) → butuh 'Awl
+                this.warisInput = {
+                    totalAssets: 240000000,
+                    debt: 0,
+                    wasiatPercent: 0,
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.istri = 1;
+                this.warisInput.heirs.ibu = 1;
+                this.warisInput.heirs.saudaraPerempuanKandung = 2;
+                this.calculateInheritance();
+            },
+
+            loadCase4() {
+                // SOAL 4: COMPLEX - Kasus Gharrawain (Umariyatain)
+                // Bu Aisyah meninggal tanpa anak
+                // Harta: Rp 360,000,000
+                // Ahli waris: Suami + Ibu + Ayah
+                // Kasus khusus: Ibu dapat 1/3 dari sisa (bukan 1/3 total)
+                this.warisInput = {
+                    totalAssets: 360000000,
+                    debt: 0,
+                    wasiatPercent: 0,
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.suami = 1;
+                this.warisInput.heirs.ibu = 1;
+                this.warisInput.heirs.ayah = 1;
+                this.calculateInheritance();
+            },
+
+            loadCase5() {
+                // SOAL 5: EXPERT - Hijab Kompleks
+                // Pak Hasan meninggal dengan banyak keluarga
+                // Harta: Rp 1,200,000,000
+                // Utang: Rp 200,000,000
+                // Wasiat: 5% untuk masjid
+                // Ahli waris potensial: Istri + Ayah + Ibu + Kakek + Nenek + 
+                //                       2 anak laki + 1 anak perempuan + 
+                //                       Saudara kandung (akan terhalang oleh anak & ayah)
+                this.warisInput = {
+                    totalAssets: 1200000000,
+                    debt: 200000000,
+                    wasiatPercent: 5,
+                    heirs: this.createEmptyHeirs()
+                };
+                this.warisInput.heirs.istri = 1;
+                this.warisInput.heirs.ayah = 1;
+                this.warisInput.heirs.ibu = 1;
+                this.warisInput.heirs.kakekAyah = 1;  // Akan terhalang oleh ayah
+                this.warisInput.heirs.nenekIbu = 1;  // Akan terhalang oleh ibu
+                this.warisInput.heirs.anakLaki = 2;
+                this.warisInput.heirs.anakPerempuan = 1;
+                this.warisInput.heirs.saudaraLakiKandung = 1;  // Akan terhalang oleh anak
+                this.warisInput.heirs.saudaraPerempuanKandung = 2;  // Akan terhalang oleh anak
+                this.calculateInheritance();
+            },
+            
+            convertToTerbilang() {
+                this.terbilangError = null;
+                this.terbilangResult = '';
+                
+                if (!this.terbilangInput.trim()) return;
+                
+                try {
+                    const result = window.Waris.Terbilang.Convert(parseFloat(this.terbilangInput));
+                    this.terbilangResult = result;
+                } catch (error) {
+                    this.terbilangError = error.message;
+                }
+            },
+            
+            setExample(value) {
+                this.terbilangInput = value;
+                this.convertToTerbilang();
+            },
+            
+            formatCurrency(amount) {
+                if (typeof amount === 'bigint') {
+                    return 'Rp ' + amount.toLocaleString('id-ID');
+                }
+                return 'Rp ' + Number(amount).toLocaleString('id-ID');
+            },
+            
+            formatNumber(num) {
+                if (!num) return '';
+                return Number(num).toLocaleString('id-ID');
+            },
+            
+            formatTerbilang(amount) {
+                try {
+                    if (typeof amount === 'bigint') {
+                        return window.Waris.Terbilang.ConvertBigInt(amount);
+                    }
+                    return window.Waris.Terbilang.Convert(Number(amount));
+                } catch {
+                    return '';
+                }
+            },
+            
+            getHeirDisplayName(type) {
+                const names = {
+                    'istri': 'Istri',
+                    'suami': 'Suami', 
+                    'ayah': 'Ayah',
+                    'ibu': 'Ibu',
+                    'anakLaki': 'Anak Laki-laki',
+                    'anakPerempuan': 'Anak Perempuan',
+                    'kakekAyah': 'Kakek (Ayah)',
+                    'nenekAyah': 'Nenek (Ayah)',
+                    'nenekIbu': 'Nenek (Ibu)',
+                    'cucuLakiDariAnakLaki': 'Cucu Laki-laki',
+                    'cucuPerempuanDariAnakLaki': 'Cucu Perempuan',
+                    'saudaraLakiKandung': 'Saudara Laki Kandung',
+                    'saudaraPerempuanKandung': 'Saudara Perempuan Kandung',
+                    'saudaraLakiSeayah': 'Saudara Laki Seayah',
+                    'saudaraPerempuanSeayah': 'Saudara Perempuan Seayah',
+                    'saudaraLakiSeibu': 'Saudara Laki Seibu',
+                    'saudaraPerempuanSeibu': 'Saudara Perempuan Seibu',
+                    'keponakanLakiDariSaudaraLakiKandung': 'Keponakan Laki dari Saudara Laki Kandung',
+                    'pamanKandung': 'Paman Kandung',
+                    'pamanSeayah': 'Paman Seayah'
+                };
+                return names[type] || type.charAt(0).toUpperCase() + type.slice(1);
+            },
+            
+            formatFraction(portion) {
+                if (!portion || !portion.num || !portion.den) return '';
+                if (portion.num === portion.den) return '1';
+                return `${portion.num}/${portion.den}`;
+            },
+            
+            createEmptyHeirs() {
+                return {
+                    suami: 0,
+                    istri: 0,
+                    ayah: 0,
+                    ibu: 0,
+                    kakekAyah: 0,
+                    nenekAyah: 0,
+                    nenekIbu: 0,
+                    anakLaki: 0,
+                    anakPerempuan: 0,
+                    cucuLakiDariAnakLaki: 0,
+                    cucuPerempuanDariAnakLaki: 0,
+                    saudaraLakiKandung: 0,
+                    saudaraPerempuanKandung: 0,
+                    saudaraLakiSeayah: 0,
+                    saudaraPerempuanSeayah: 0,
+                    saudaraLakiSeibu: 0,
+                    saudaraPerempuanSeibu: 0,
+                    keponakanLakiDariSaudaraLakiKandung: 0,
+                    pamanKandung: 0,
+                    pamanSeayah: 0
+                };
+            }
+        });
+    </script>
+</body>
+</html> 
