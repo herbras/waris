@@ -487,7 +487,7 @@ Fungsi utama buat hitung pembagian warisan Islam sesuai aturan fiqh.
 
 **Pasangan:**
 - `suami` - Suami (0|1)
-- `istri` - Istri (0|1)
+- `istri` - Istri (0-4)
 
 **Orang Tua & Kakek Nenek:**
 - `ayah` - Ayah (0|1)
