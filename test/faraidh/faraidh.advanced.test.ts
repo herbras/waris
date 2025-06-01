@@ -310,7 +310,6 @@ describe("Faraidh Advanced Calculations", () => {
 			const wifeResult = result.fardResults.find((r) => r.type === "istri");
 			const fatherResult = result.fardResults.find((r) => r.type === "ayah");
 			const motherResult = result.fardResults.find((r) => r.type === "ibu");
-			const grandmotherResult = result.fardResults.find((r) => r.type === "nenekIbu");
 			const sonsResult = result.asabahResults.find((r) => r.type === "anakLaki");
 			const daughtersResult = result.asabahResults.find((r) => r.type === "anakPerempuan");
 
