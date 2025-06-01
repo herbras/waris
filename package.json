@@ -1,6 +1,6 @@
 {
 	"name": "waris",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Islamic inheritance calculator (faraidh) and Indonesian number-to-words converter (terbilang) with BigInt precision",
 	"type": "module",
 	"main": "./dist/waris.umd.js",

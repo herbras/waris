@@ -6,6 +6,13 @@
 ![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+**🔗 Quick Links:**
+- 📦 [NPM Package](https://www.npmjs.com/package/waris)
+- 🚀 [jsDelivr CDN](https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js)
+- 🌐 [unpkg CDN](https://unpkg.com/waris@1.0.0/dist/waris.umd.js)
+- 📚 [Demo HTML](./index.html)
+- 🧪 [Tests: 124/124 ✅](./test/)
+
 Kalkulator pembagian waris Islam yang lengkap dengan fitur konversi angka ke terbilang Indonesia. Dibuat mengikuti aturan fiqh madzhab Syafii dan mendukung semua skenario pembagian warisan yang umum terjadi.
 
 ## 📚 Kosakata dan Terminologi Faraidh
@@ -180,6 +187,79 @@ pnpm add waris
 
 # Atau dengan bun
 bun add waris
+```
+
+### CDN (Browser)
+
+**📦 NPM Package:** [`waris`](https://www.npmjs.com/package/waris)
+
+#### 🚀 jsDelivr CDN (Recommended)
+```html
+<!-- UMD (Universal Module Definition) - Paling kompatibel -->
+<script src="https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js"></script>
+
+<!-- ES Module (Modern browsers) -->
+<script type="module">
+  import { calculateFaraidh, Terbilang } from 'https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.es.mjs';
+</script>
+
+<!-- Minified version -->
+<script src="https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js"></script>
+```
+
+#### 🌐 unpkg CDN (Alternative)
+```html
+<script src="https://unpkg.com/waris@1.0.0/dist/waris.umd.js"></script>
+```
+
+#### 📝 Contoh Penggunaan CDN
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Waris CDN Demo</title>
+</head>
+<body>
+    <!-- Load library -->
+    <script src="https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js"></script>
+    
+    <script>
+        // ✅ Global Waris tersedia
+        console.log('Waris loaded:', !!window.Waris);
+        
+        // 🕌 Hitung faraidh
+        const result = Waris.Waris.calculateFaraidh({
+            totalAssets: 1000000000n,   // 1 miliar
+            utang: 0n,
+            wasiatFraction: { num: 0n, den: 1n },
+            heirs: { 
+                istri: 1, 
+                anakPerempuan: 2,
+                suami: 0, ayah: 0, ibu: 0, anakLaki: 0,
+                kakekAyah: 0, nenekAyah: 0, nenekIbu: 0,
+                cucuLakiDariAnakLaki: 0, cucuPerempuanDariAnakLaki: 0,
+                saudaraLakiKandung: 0, saudaraPerempuanKandung: 0,
+                saudaraLakiSeayah: 0, saudaraPerempuanSeayah: 0,
+                saudaraLakiSeibu: 0, saudaraPerempuanSeibu: 0,
+                keponakanLakiDariSaudaraLakiKandung: 0,
+                pamanKandung: 0, pamanSeayah: 0
+            }
+        });
+        
+        console.log('💰 Total distribusi:', result.totalDistributed);
+        
+        // 🔢 Konversi terbilang
+        const amount = 150000000n;
+        const terbilang = Waris.Terbilang.ConvertBigInt(amount);
+        console.log(`Rp ${amount.toLocaleString()} = "${terbilang} rupiah"`);
+        
+        // 📊 Tampilkan hasil
+        result.fardResults?.forEach(heir => {
+            console.log(`${heir.type}: Rp ${heir.totalShare.toLocaleString()}`);
+        });
+    </script>
+</body>
+</html>
 ```
 
 ### Development
