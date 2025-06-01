@@ -1,7 +1,10 @@
 # Kalkulator Waris Islam - Sistem Faraidh Digital
 
+[![npm version](https://badge.fury.io/js/waris.svg)](https://badge.fury.io/js/waris)
+[![npm downloads](https://img.shields.io/npm/dm/waris.svg)](https://www.npmjs.com/package/waris)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=for-the-badge&logo=bun&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Kalkulator pembagian waris Islam yang lengkap dengan fitur konversi angka ke terbilang Indonesia. Dibuat mengikuti aturan fiqh madzhab Syafii dan mendukung semua skenario pembagian warisan yang umum terjadi.
 
@@ -162,6 +165,25 @@ Kalkulator pembagian waris Islam yang lengkap dengan fitur konversi angka ke ter
 
 ## Instalasi
 
+### NPM (Recommended)
+
+```bash
+npm install waris
+```
+
+```bash
+# Atau dengan yarn
+yarn add waris
+
+# Atau dengan pnpm  
+pnpm add waris
+
+# Atau dengan bun
+bun add waris
+```
+
+### Development
+
 ```bash
 # Clone repositorynya
 git clone <repository-url>
@@ -179,7 +201,7 @@ bun test
 ### Perhitungan Faraidh Dasar
 
 ```typescript
-import { calculateFaraidh, HeirCounts } from './src/faraidh';
+import { calculateFaraidh, type HeirCounts } from 'waris';
 
 // Tentuin ahli warisnya
 const heirs: HeirCounts = {
