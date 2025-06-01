@@ -32,12 +32,19 @@ export class Terbilang {
 	}
 
 	static Convert(input: Decimal | number, originalStr?: string): string {
-		if (typeof input !== "number" && !(input instanceof Decimal)) {
+		// Use duck typing instead of instanceof to work with bundled versions
+		const isDecimalInstance = 
+			typeof input === "object" && 
+			input !== null &&
+			typeof input.isZero === "function" &&
+			typeof input.isNegative === "function";
+			
+		if (typeof input !== "number" && !isDecimalInstance) {
 			throw new TypeError("Input must be a number or Decimal instance");
 		}
 
 		const value: Decimal =
-			typeof input === "number" ? new Decimal(input) : input;
+			typeof input === "number" ? new Decimal(input) : input as Decimal;
 		if (value.isZero()) return "nol";
 
 		const isNegative = value.isNegative();

@@ -1,4 +1,4 @@
-import { Terbilang } from "@/utils/Terbilang";
+import { Terbilang } from "../../utils/Terbilang";
 
 /**
  * Convert BigInt to Indonesian words using existing Terbilang class
