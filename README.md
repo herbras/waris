@@ -8,9 +8,9 @@
 
 **🔗 Quick Links:**
 - 📦 [NPM Package](https://www.npmjs.com/package/waris)
-- 🚀 [jsDelivr CDN](https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js)
-- 🌐 [unpkg CDN](https://unpkg.com/waris@1.0.0/dist/waris.umd.js)
-- 📚 [Demo HTML](./index.html)
+- 🚀 [jsDelivr CDN](https://cdn.jsdelivr.net/npm/waris@latest/dist/waris.umd.js)
+- 🌐 [unpkg CDN](https://unpkg.com/waris@latest/dist/waris.umd.js)
+- 📚 [Demo HTML](https://herbras.github.io/waris/)
 - 🧪 [Tests: 124/124 ✅](./test/)
 
 Kalkulator pembagian waris Islam yang lengkap dengan fitur konversi angka ke terbilang Indonesia. Dibuat mengikuti aturan fiqh madzhab Syafii dan mendukung semua skenario pembagian warisan yang umum terjadi.
@@ -196,20 +196,20 @@ bun add waris
 #### 🚀 jsDelivr CDN (Recommended)
 ```html
 <!-- UMD (Universal Module Definition) - Paling kompatibel -->
-<script src="https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/waris@latest/dist/waris.umd.js"></script>
 
 <!-- ES Module (Modern browsers) -->
 <script type="module">
-  import { calculateFaraidh, Terbilang } from 'https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.es.mjs';
+  import { calculateFaraidh, Terbilang } from 'https://cdn.jsdelivr.net/npm/waris@latest/dist/waris.es.mjs';
 </script>
 
 <!-- Minified version -->
-<script src="https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/waris@latest/dist/waris.umd.js"></script>
 ```
 
 #### 🌐 unpkg CDN (Alternative)
 ```html
-<script src="https://unpkg.com/waris@1.0.0/dist/waris.umd.js"></script>
+<script src="https://unpkg.com/waris@latest/dist/waris.umd.js"></script>
 ```
 
 #### 📝 Contoh Penggunaan CDN
@@ -221,7 +221,7 @@ bun add waris
 </head>
 <body>
     <!-- Load library -->
-    <script src="https://cdn.jsdelivr.net/npm/waris@1.0.0/dist/waris.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/waris@latest/dist/waris.umd.js"></script>
     
     <script>
         // ✅ Global Waris tersedia
