@@ -309,16 +309,16 @@ describe("Faraidh Basic Calculations", () => {
 			const result = calculateFaraidh(input);
 
 			expect(result.utang).toBe(20000000n);
-			expect(result.wasiat).toBe(16666666n); // 1/6 of (120M - 20M)
-			expect(result.netEstate).toBe(83333334n); // 120M - 20M - 16.67M
+			expect(result.wasiat).toBe(16666667n); // 1/6 of (120M - 20M) with proper rounding
+			expect(result.netEstate).toBe(83333333n); // 120M - 20M - 16.67M
 
 			// Wife gets only 1/4 of net estate (no radd for spouse in Syafii madzhab)
 			const wifeResult = result.fardResults.find((r) => r.type === "istri");
-			expect(wifeResult?.totalShare).toBe(20833333n); // 1/4 of 83333334 ≈ 20.83M
+			expect(wifeResult?.totalShare).toBe(20833333n); // 1/4 of 83333333 with proper rounding
 			expect(result.raddApplied).toBe(false); // No radd for spouse
 
 			// Total distributed = debt + wasiat + wife's share
-			expect(result.totalDistributed).toBe(57499999n); // 20M + 16.67M + 20.83M
+			expect(result.totalDistributed).toBe(57500000n); // 20M + 16.67M + 20.83M (now exact)
 		});
 	});
 

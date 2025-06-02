@@ -700,13 +700,22 @@ function applyRadd(
 	residualAmount: bigint,
 	_originalFractions: Fraction[],
 ): HeirResult[] {
-	// Calculate total shares of eligible heirs for proportional distribution
 	const totalEligibleSiham = eligibleHeirs.reduce((sum, heir) => {
 		return sum + heir.portion.num;
 	}, 0n);
 
-	return eligibleHeirs.map((heir) => {
-		const raddShare = (residualAmount * heir.portion.num) / totalEligibleSiham;
+	let totalDistributed = 0n;
+	
+	return eligibleHeirs.map((heir, index) => {
+		let raddShare: bigint;
+		
+		if (index === eligibleHeirs.length - 1) {
+			raddShare = residualAmount - totalDistributed;
+		} else {
+			raddShare = (residualAmount * heir.portion.num) / totalEligibleSiham;
+			totalDistributed += raddShare;
+		}
+		
 		const individualRaddShare =
 			heir.count > 1 ? raddShare / BigInt(heir.count) : raddShare;
 

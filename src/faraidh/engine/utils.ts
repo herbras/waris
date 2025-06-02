@@ -58,7 +58,16 @@ export function multiplyFractionBase(base: bigint, fraction: Fraction): bigint {
 	if (base < 0n) {
 		throw new Error("Base amount cannot be negative");
 	}
-	return (base * fraction.num) / fraction.den;
+
+	const numerator = base * fraction.num;
+	const result = numerator / fraction.den;
+	const remainder = numerator % fraction.den;
+
+	if (remainder * 2n >= fraction.den) {
+		return result + 1n;
+	}
+
+	return result;
 }
 
 /**
