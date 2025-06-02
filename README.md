@@ -71,8 +71,10 @@ Kalkulator pembagian waris Islam yang lengkap dengan fitur konversi angka ke ter
 
 **Radd (الرد)**
 - "Pengembalian" sisa harta kepada ahli waris yang berhak
-- Terjadi ketika total bagian < 1 dan tidak ada asabah
+- Terjadi ketika total bagian fard < 1 dan tidak ada asabah
+- Distribusi proporsional berdasarkan bagian fard awal
 - Biasanya suami/istri tidak dapat radd (tergantung madzhab)
+- Hanya untuk ashab al-furud yang eligible (bukan pasangan)
 
 **Hajb (الحجب)**
 - Sistem "pemblokiran" atau penghalangan ahli waris
@@ -98,6 +100,16 @@ Kalkulator pembagian waris Islam yang lengkap dengan fitur konversi angka ke ter
 - **1/6 (السدس)** - Ibu dengan anak, ayah dengan anak, nenek, 1 saudara seibu
 
 ### Kasus-kasus Khusus
+
+**Radd (الرد) - Pengembalian Sisa Harta**
+- **Kondisi**: Total bagian fard < 100% DAN tidak ada asabah
+- **Yang berhak**: Ashab al-furud eligible (bukan suami/istri dalam madzhab Syafii)
+- **Perhitungan**: Sisa dibagi proporsional sesuai rasio bagian fard awal
+- **Contoh**: Ibu (1/6) + 2 Anak Perempuan (2/3) = 5/6, sisa 1/6 di-radd
+- **Rumus Radd**: 
+  ```
+  Bagian_Akhir = Bagian_Fard + (Sisa_Harta × Bagian_Fard / Total_Fard_Eligible)
+  ```
 
 **Gharrawain/Umariyatain (الغراوين)**
 - Kasus: suami + ayah + ibu

@@ -109,10 +109,11 @@ describe("Faraidh Basic Calculations", () => {
 
 			expect(result.fardResults).toHaveLength(1);
 			expect(result.fardResults[0].type).toBe("istri");
-			// Wife gets 1/4 as fard + remaining 3/4 via radd = 100M total
-			expect(result.fardResults[0].totalShare).toBe(100000000n);
-			expect(result.raddApplied).toBe(true);
-			expect(result.totalDistributed).toBe(100000000n);
+			// Wife gets only 1/4 as fard (no radd for spouse in Syafii madzhab)
+			expect(result.fardResults[0].totalShare).toBe(25000000n); // 1/4 of 100M = 25M
+			expect(result.raddApplied).toBe(false); // No radd for spouse
+			// Remaining 75M goes to state (Baitul Mal) - not distributed
+			expect(result.totalDistributed).toBe(25000000n);
 		});
 
 		it("should calculate inheritance for multiple wives (up to 4)", () => {
@@ -131,11 +132,12 @@ describe("Faraidh Basic Calculations", () => {
 			expect(result.fardResults).toHaveLength(1);
 			expect(result.fardResults[0].type).toBe("istri");
 			expect(result.fardResults[0].count).toBe(3); // 3 wives
-			// 3 wives share 1/4 collectively + remaining 3/4 via radd = 120M total
-			expect(result.fardResults[0].totalShare).toBe(120000000n);
-			expect(result.fardResults[0].individualShare).toBe(40000000n); // 120M / 3 = 40M each
-			expect(result.raddApplied).toBe(true);
-			expect(result.totalDistributed).toBe(120000000n);
+			// 3 wives share 1/4 collectively only (no radd for spouses in Syafii madzhab)
+			expect(result.fardResults[0].totalShare).toBe(30000000n); // 1/4 of 120M = 30M
+			expect(result.fardResults[0].individualShare).toBe(10000000n); // 30M / 3 = 10M each
+			expect(result.raddApplied).toBe(false); // No radd for spouses
+			// Remaining 90M goes to state (Baitul Mal) - not distributed
+			expect(result.totalDistributed).toBe(30000000n);
 		});
 
 		it("should calculate inheritance for 4 wives with children", () => {
@@ -179,9 +181,11 @@ describe("Faraidh Basic Calculations", () => {
 
 			expect(result.fardResults).toHaveLength(1);
 			expect(result.fardResults[0].type).toBe("suami");
-			// Husband gets 1/2 as fard + remaining 1/2 via radd = 80M total
-			expect(result.fardResults[0].totalShare).toBe(80000000n);
-			expect(result.raddApplied).toBe(true);
+			// Husband gets only 1/2 as fard (no radd for spouse in Syafii madzhab)
+			expect(result.fardResults[0].totalShare).toBe(40000000n); // 1/2 of 80M = 40M
+			expect(result.raddApplied).toBe(false); // No radd for spouse
+			// Remaining 40M goes to state (Baitul Mal) - not distributed
+			expect(result.totalDistributed).toBe(40000000n);
 		});
 
 		it("should calculate inheritance for wife with children", () => {
@@ -308,12 +312,13 @@ describe("Faraidh Basic Calculations", () => {
 			expect(result.wasiat).toBe(16666666n); // 1/6 of (120M - 20M)
 			expect(result.netEstate).toBe(83333334n); // 120M - 20M - 16.67M
 
-			// Wife gets all net estate (1/4 fard + 3/4 radd)
+			// Wife gets only 1/4 of net estate (no radd for spouse in Syafii madzhab)
 			const wifeResult = result.fardResults.find((r) => r.type === "istri");
-			expect(wifeResult?.totalShare).toBe(83333334n); // All net estate
-			expect(result.raddApplied).toBe(true);
+			expect(wifeResult?.totalShare).toBe(20833333n); // 1/4 of 83333334 ≈ 20.83M
+			expect(result.raddApplied).toBe(false); // No radd for spouse
 
-			expect(result.totalDistributed).toBe(120000000n);
+			// Total distributed = debt + wasiat + wife's share
+			expect(result.totalDistributed).toBe(57499999n); // 20M + 16.67M + 20.83M
 		});
 	});
 

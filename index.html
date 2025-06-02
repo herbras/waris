@@ -452,7 +452,7 @@
                                                     <div class="font-semibold text-orange-800">Ahli Waris Terhalang (Hijab)</div>
                                                     <div class="text-sm text-orange-700 mt-1">
                                                         <span class="font-medium">Yang terhalang:</span> 
-                                                        <span x-text="warisResult.ibtalApplied.map(type => getHeirDisplayName(type)).join(', ')"></span>
+                                                        <span x-text="warisResult?.ibtalApplied?.map(type => getHeirDisplayName(type)).join(', ') || ''"></span>
                                                     </div>
                                                     <div class="text-xs text-orange-600 mt-1">
                                                         Terhalang karena ada ahli waris yang lebih dekat hubungannya.
@@ -465,7 +465,7 @@
                                     <div x-show="warisResult && warisResult.heirs && warisResult.heirs.length > 0">
                                         <h4 class="font-medium mb-3 text-gray-800">👥 Pembagian Warisan</h4>
                                         <div class="space-y-3">
-                                            <template x-for="heir in (warisResult?.heirs || [])" :key="heir.name || heir.heirType">
+                                            <template x-for="(heir, index) in (warisResult?.heirs || [])" :key="heir.type + '_' + heir.category + '_' + index">
                                                 <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                                                     <!-- Header Info -->
                                                     <div class="flex items-center justify-between mb-3">
@@ -669,10 +669,10 @@
                     console.log('Calculation result:', result);
                     
                     // Combine all heir results from different categories
+                    // Note: raddResults are already merged into fardResults, so don't include them separately
                     const allHeirs = [
                         ...(result.fardResults || []),
                         ...(result.asabahResults || []),
-                        ...(result.raddResults || []),
                         ...(result.dhuwuResults || [])
                     ];
                     console.log('All heirs found:', allHeirs);

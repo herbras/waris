@@ -135,31 +135,38 @@ export function calculateFaraidh(input: CalculationInput): CalculationResult {
 
 			residualAmount = 0n;
 		} else if (finalFardResults.length > 0 && !onlyMaternalSiblings) {
-			// If no one eligible for radd but there are fard heirs (like spouse only)
-			// Distribute to all fard heirs proportionally
-			raddApplied = true;
-			raddResults = applyRadd(
-				finalFardResults,
-				residualAmount,
-				fardCalculation.fractions,
+			// Check if there are radd-eligible heirs among fard results
+			const raddEligibleFromFard = finalFardResults.filter((hr) =>
+				isEligibleForRadd(hr.type, madzhab),
 			);
+			
+			if (raddEligibleFromFard.length > 0) {
+				// Apply radd only to eligible heirs (e.g., daughters but not spouse)
+				raddApplied = true;
+				raddResults = applyRadd(
+					raddEligibleFromFard,
+					residualAmount,
+					fardCalculation.fractions,
+				);
 
-			finalFardResults = finalFardResults.map((hr) => {
-				const raddResult = raddResults.find((rr) => rr.type === hr.type);
-				if (raddResult) {
-					const newTotalShare = hr.totalShare + raddResult.totalShare;
-					return {
-						...hr,
-						totalShare: newTotalShare,
-						individualShare:
-							hr.count > 1 ? newTotalShare / BigInt(hr.count) : newTotalShare,
-						portion: addFractions(hr.portion, raddResult.portion),
-					};
-				}
-				return hr;
-			});
+				finalFardResults = finalFardResults.map((hr) => {
+					const raddResult = raddResults.find((rr) => rr.type === hr.type);
+					if (raddResult) {
+						const newTotalShare = hr.totalShare + raddResult.totalShare;
+						return {
+							...hr,
+							totalShare: newTotalShare,
+							individualShare:
+								hr.count > 1 ? newTotalShare / BigInt(hr.count) : newTotalShare,
+							portion: addFractions(hr.portion, raddResult.portion),
+						};
+					}
+					return hr;
+				});
 
-			residualAmount = 0n;
+				residualAmount = 0n;
+			}
+			// If no radd-eligible heirs among fard, residue goes to dhuwu or state
 		}
 	}
 
