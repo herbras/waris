@@ -99,6 +99,7 @@ export interface CalculationResult {
 	awlRatio?: Fraction; // Reduction ratio if awl applied
 	ibtalApplied: string[]; // List of blocked heirs (hajb)
 	raddApplied: boolean; // Whether residue return applied
+	isGharrawain?: boolean; // Whether Gharrawain/Umariyatain case applied
 
 	// Summary information
 	totalDistributed: bigint; // Total amount distributed

@@ -402,9 +402,24 @@
                                     </div>
 
                                     <!-- Special Cases Info -->
-                                    <div x-show="warisResult?.awlApplied || warisResult?.raddApplied || warisResult?.ibtalApplied?.length > 0" 
+                                    <div x-show="warisResult?.awlApplied || warisResult?.raddApplied || warisResult?.ibtalApplied?.length > 0 || warisResult?.isGharrawain" 
                                          class="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 p-4 rounded-lg">
                                         <h5 class="font-semibold text-amber-800 mb-2">📋 Keterangan Khusus</h5>
+                                        
+                                        <div x-show="warisResult?.isGharrawain" class="mb-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                                            <div class="flex items-start space-x-2">
+                                                <span class="text-purple-600 mt-0.5">⚖️</span>
+                                                <div>
+                                                    <div class="font-semibold text-purple-800">Kasus Gharrawain/Umariyatain</div>
+                                                    <div class="text-sm text-purple-700 mt-1">
+                                                        Kasus khusus: Pasangan + Ibu + Ayah tanpa anak. Ibu mendapat 1/3 dari sisa harta setelah dikurangi bagian pasangan (bukan 1/3 dari total harta).
+                                                    </div>
+                                                    <div class="text-xs text-purple-600 mt-1">
+                                                        Dinamakan Gharrawain karena kasus ini terjadi pada masa khalifah Umar bin Khattab RA.
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                         
                                         <div x-show="warisResult?.awlApplied" class="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                                             <div class="flex items-start space-x-2">

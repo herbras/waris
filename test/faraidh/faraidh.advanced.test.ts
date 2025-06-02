@@ -477,16 +477,11 @@ describe("Faraidh Advanced Calculations", () => {
 							   result.fardResults.find((r) => r.type === "ayah");
 
 			expect(suamiResult?.totalShare).toBe(60000000n); // 60 juta
-			// Exact values depend on Gharrawain implementation
-			// Check the actual distribution - implementation follows different pattern
-			console.log('Gharrawain distribution:', {
-				suami: suamiResult?.totalShare,
-				ibu: ibuResult?.totalShare, 
-				ayah: ayahResult?.totalShare
-			});
-			expect(ibuResult?.totalShare).toBeGreaterThan(15000000n); // Should get reasonable share
-			expect(ayahResult?.totalShare).toBeGreaterThan(15000000n); // Should get reasonable share
+			expect(ibuResult?.totalShare).toBe(20000000n); // 20 juta (1/3 dari sisa 60M)
+			expect(ayahResult?.totalShare).toBe(40000000n); // 40 juta (sisa)
 
+			// Validate Gharrawain case is detected
+			expect(result.isGharrawain).toBe(true);
 			expect(result.totalDistributed).toBe(120000000n);
 		});
 

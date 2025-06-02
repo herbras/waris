@@ -45,14 +45,24 @@ export function calculateFaraidh(input: CalculationInput): CalculationResult {
 	const eligibleHeirs = applyHajbRules(heirs, madzhab);
 	const ibtalApplied = getBlockedHeirs(heirs, eligibleHeirs);
 
-	// 3. Calculate fard shares (ashab al-furud)
+	// 3. Check for special cases
+	const hasDescendant =
+		heirs.anakLaki +
+			heirs.anakPerempuan +
+			heirs.cucuLakiDariAnakLaki +
+			heirs.cucuPerempuanDariAnakLaki >
+		0;
+	const hasSpouse = heirs.suami === 1 || heirs.istri > 0;
+	const isGharrawain = hasSpouse && heirs.ibu === 1 && heirs.ayah === 1 && !hasDescendant;
+
+	// 4. Calculate fard shares (ashab al-furud)
 	const fardCalculation = calculateFardShares(
 		eligibleHeirs,
 		netEstate,
 		madzhab,
 	);
 
-	// 4. Determine if Awl or Radd is needed
+	// 5. Determine if Awl or Radd is needed
 	const totalFardFraction = fardCalculation.fractions.reduce(
 		(sum, frac) => addFractions(sum, frac),
 		{ num: 0n, den: 1n },
@@ -64,7 +74,7 @@ export function calculateFaraidh(input: CalculationInput): CalculationResult {
 	let finalFardResults = fardCalculation.results;
 	let residualAmount = netEstate - sumShares(finalFardResults);
 
-	// 5. Apply Awl if total fard > 1
+	// 6. Apply Awl if total fard > 1
 	if (totalFardFraction.num > totalFardFraction.den) {
 		awlApplied = true;
 		awlRatio = { num: totalFardFraction.den, den: totalFardFraction.num };
@@ -76,14 +86,14 @@ export function calculateFaraidh(input: CalculationInput): CalculationResult {
 		residualAmount = 0n; // No residual after Awl
 	}
 
-	// 6. Calculate asabah shares (if no Awl and there's residual)
+	// 7. Calculate asabah shares (if no Awl and there's residual)
 	let asabahResults: HeirResult[] = [];
 	if (!awlApplied && residualAmount > 0n) {
 		asabahResults = calculateAsabahShares(eligibleHeirs, residualAmount);
 		residualAmount -= sumShares(asabahResults);
 	}
 
-	// 7. Apply Radd if there's still residual and no asabah
+	// 8. Apply Radd if there's still residual and no asabah
 	let raddResults: HeirResult[] = [];
 	if (!awlApplied && residualAmount > 0n && asabahResults.length === 0) {
 		const raddEligible = finalFardResults.filter((hr) =>
@@ -153,14 +163,14 @@ export function calculateFaraidh(input: CalculationInput): CalculationResult {
 		}
 	}
 
-	// 8. Handle Dhawu al-Arham if still residual and no other heirs
+	// 9. Handle Dhawu al-Arham if still residual and no other heirs
 	let dhuwuResults: HeirResult[] = [];
 	if (residualAmount > 0n && asabahResults.length === 0 && !raddApplied) {
 		dhuwuResults = calculateDhuwuShares(eligibleHeirs, residualAmount);
 		residualAmount -= sumShares(dhuwuResults);
 	}
 
-	// 9. Calculate final summary
+	// 10. Calculate final summary
 	const allResults = [...finalFardResults, ...asabahResults, ...dhuwuResults];
 	const totalDistributed = utang + wasiat + sumShares(allResults);
 
@@ -180,6 +190,7 @@ export function calculateFaraidh(input: CalculationInput): CalculationResult {
 		awlRatio,
 		ibtalApplied,
 		raddApplied,
+		isGharrawain,
 		totalDistributed,
 		calculationSummary: {
 			aslMasalah,
@@ -238,6 +249,7 @@ function getBlockedHeirs(original: HeirCounts, eligible: HeirCounts): string[] {
 
 /**
  * Calculate fard (fixed) shares for ashab al-furud
+ * Special handling for Gharrawain/Umariyatain cases
  */
 function calculateFardShares(
 	heirs: HeirCounts,
@@ -266,14 +278,20 @@ function calculateFardShares(
 		}
 	}
 
-	// SPOUSE (suami/istri)
+	// Check for Gharrawain/Umariyatain case
+	// Conditions: (spouse + mother + father) and no children
+	const hasDescendant =
+		heirs.anakLaki +
+			heirs.anakPerempuan +
+			heirs.cucuLakiDariAnakLaki +
+			heirs.cucuPerempuanDariAnakLaki >
+		0;
+	const hasSpouse = heirs.suami === 1 || heirs.istri > 0;
+	const isGharrawainCase = hasSpouse && heirs.ibu === 1 && heirs.ayah === 1 && !hasDescendant;
+
+	// SPOUSE (suami/istri) - calculated first in Gharrawain case
 	if (heirs.istri > 0) {
-		const hasChild =
-			heirs.anakLaki +
-				heirs.anakPerempuan +
-				heirs.cucuLakiDariAnakLaki +
-				heirs.cucuPerempuanDariAnakLaki >
-			0;
+		const hasChild = hasDescendant;
 		const fraction = hasChild
 			? reduceFraction({ num: 1n, den: 8n })
 			: reduceFraction({ num: 1n, den: 4n });
@@ -281,62 +299,73 @@ function calculateFardShares(
 	}
 
 	if (heirs.suami === 1) {
-		const hasChild =
-			heirs.anakLaki +
-				heirs.anakPerempuan +
-				heirs.cucuLakiDariAnakLaki +
-				heirs.cucuPerempuanDariAnakLaki >
-			0;
+		const hasChild = hasDescendant;
 		const fraction = hasChild
 			? reduceFraction({ num: 1n, den: 4n })
 			: reduceFraction({ num: 1n, den: 2n });
 		addFardResult("suami", 1, fraction);
 	}
 
-	// MOTHER (ibu)
-	if (heirs.ibu === 1) {
-		const hasDescendant =
-			heirs.anakLaki +
-				heirs.anakPerempuan +
-				heirs.cucuLakiDariAnakLaki +
-				heirs.cucuPerempuanDariAnakLaki >
-			0;
-		const hasSibling =
-			heirs.saudaraLakiKandung +
-				heirs.saudaraPerempuanKandung +
-				heirs.saudaraLakiSeayah +
-				heirs.saudaraPerempuanSeayah +
-				heirs.saudaraLakiSeibu +
-				heirs.saudaraPerempuanSeibu >
-			0;
+	// GHARRAWAIN/UMARIYATAIN SPECIAL CASE
+	if (isGharrawainCase) {
+		// Get spouse's share first
+		const spouseResult = results[0]; // spouse is added first above
+		const remainderAfterSpouse = netEstate - spouseResult.totalShare;
+		
+		// Mother gets 1/3 of remainder (not 1/3 of total)
+		const motherShare = remainderAfterSpouse / 3n;
+		const motherFraction = reduceFraction({ 
+			num: motherShare, 
+			den: netEstate 
+		});
+		
+		results.push({
+			type: "ibu",
+			count: 1,
+			totalShare: motherShare,
+			individualShare: motherShare,
+			portion: motherFraction,
+			category: "fard",
+		});
+		fractions.push(motherFraction);
 
-		let fraction: Fraction;
-		if (madzhab === "syafii") {
-			fraction =
-				hasDescendant || hasSibling
-					? reduceFraction({ num: 1n, den: 6n })
-					: reduceFraction({ num: 1n, den: 3n });
-		} else {
-			// Other madhabs may have different rules
-			fraction = reduceFraction({ num: 1n, den: 6n });
+		// Father gets remainder as asabah (will be handled in asabah section)
+		// Don't add father to fard results in Gharrawain case
+	} else {
+		// MOTHER (ibu) - standard calculation
+		if (heirs.ibu === 1) {
+			const hasSibling =
+				heirs.saudaraLakiKandung +
+					heirs.saudaraPerempuanKandung +
+					heirs.saudaraLakiSeayah +
+					heirs.saudaraPerempuanSeayah +
+					heirs.saudaraLakiSeibu +
+					heirs.saudaraPerempuanSeibu >
+				0;
+
+			let fraction: Fraction;
+			if (madzhab === "syafii") {
+				fraction =
+					hasDescendant || hasSibling
+						? reduceFraction({ num: 1n, den: 6n })
+						: reduceFraction({ num: 1n, den: 3n });
+			} else {
+				// Other madhabs may have different rules
+				fraction = reduceFraction({ num: 1n, den: 6n });
+			}
+			addFardResult("ibu", 1, fraction);
 		}
-		addFardResult("ibu", 1, fraction);
-	}
 
-	// FATHER (ayah) - only gets fard if there are children
-	if (heirs.ayah === 1) {
-		const hasChild =
-			heirs.anakLaki +
-				heirs.anakPerempuan +
-				heirs.cucuLakiDariAnakLaki +
-				heirs.cucuPerempuanDariAnakLaki >
-			0;
+		// FATHER (ayah) - only gets fard if there are children (not in Gharrawain)
+		if (heirs.ayah === 1) {
+			const hasChild = hasDescendant;
 
-		if (hasChild) {
-			const fraction = reduceFraction({ num: 1n, den: 6n });
-			addFardResult("ayah", 1, fraction);
+			if (hasChild) {
+				const fraction = reduceFraction({ num: 1n, den: 6n });
+				addFardResult("ayah", 1, fraction);
+			}
+			// If no children, father becomes asabah (gets residual)
 		}
-		// If no children, father becomes asabah (gets residual)
 	}
 
 	// DAUGHTERS (anak perempuan) - only if no sons
@@ -369,12 +398,7 @@ function calculateFardShares(
 	// GRANDPARENTS
 	if (heirs.kakekAyah === 1 && heirs.ayah === 0) {
 		// Grandfather gets 1/6 if there are children, otherwise becomes asabah
-		const hasChild =
-			heirs.anakLaki +
-				heirs.anakPerempuan +
-				heirs.cucuLakiDariAnakLaki +
-				heirs.cucuPerempuanDariAnakLaki >
-			0;
+		const hasChild = hasDescendant;
 
 		if (hasChild) {
 			const fraction = reduceFraction({ num: 1n, den: 6n });
@@ -543,7 +567,7 @@ function calculateAsabahShares(
 		shareRatio: bigint;
 	}> = [];
 
-	// FATHER becomes asabah if no children
+	// FATHER becomes asabah if no children OR in Gharrawain case
 	const hasChildren =
 		heirs.anakLaki +
 			heirs.anakPerempuan +
@@ -551,7 +575,11 @@ function calculateAsabahShares(
 			heirs.cucuPerempuanDariAnakLaki >
 		0;
 
-	if (heirs.ayah === 1 && !hasChildren) {
+	// Check for Gharrawain case
+	const hasSpouse = heirs.suami === 1 || heirs.istri > 0;
+	const isGharrawainCase = hasSpouse && heirs.ibu === 1 && heirs.ayah === 1 && !hasChildren;
+
+	if (heirs.ayah === 1 && (!hasChildren || isGharrawainCase)) {
 		asabahHeirs.push({ type: "ayah", count: 1, shareRatio: 1n });
 		totalAsabahShares += 1n;
 	}

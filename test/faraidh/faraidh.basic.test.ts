@@ -274,15 +274,19 @@ describe("Faraidh Basic Calculations", () => {
 
 			const result = calculateFaraidh(input);
 
-			// Wife: 1/4 (30M), Mother: 1/3 (40M), Father: remainder as asabah (50M)
-			// Note: Mother gets 1/3 (not 1/6) when no children/siblings present
+			// Gharrawain/Umariyatain case: Wife + Mother + Father, no children
+			// Wife: 1/4 = 30M
+			// Remainder after wife: 120M - 30M = 90M  
+			// Mother: 1/3 of remainder = 1/3 * 90M = 30M
+			// Father: remainder = 90M - 30M = 60M
 			const wifeResult = result.fardResults.find((r) => r.type === "istri");
 			const motherResult = result.fardResults.find((r) => r.type === "ibu");
 			const fatherResult = result.asabahResults.find((r) => r.type === "ayah");
 
 			expect(wifeResult?.totalShare).toBe(30000000n); // 1/4 of 120M
-			expect(motherResult?.totalShare).toBe(40000000n); // 1/3 of 120M
-			expect(fatherResult?.totalShare).toBe(50000000n); // Remainder
+			expect(motherResult?.totalShare).toBe(30000000n); // 1/3 of remainder (90M)
+			expect(fatherResult?.totalShare).toBe(60000000n); // Final remainder
+			expect(result.isGharrawain).toBe(true); // Should detect Gharrawain case
 
 			expect(result.totalDistributed).toBe(120000000n);
 		});

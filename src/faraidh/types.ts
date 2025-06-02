@@ -91,6 +91,7 @@ export interface CalculationResult {
 	awlRatio?: Fraction; // if awl applied, the reduction ratio
 	ibtalApplied: string[]; // list of heirs blocked (hajb)
 	raddApplied: boolean; // whether radd (return of residue) was applied
+	isGharrawain?: boolean; // whether Gharrawain/Umariyatain case was applied
 
 	// Summary
 	totalDistributed: bigint; // should equal totalAssets
