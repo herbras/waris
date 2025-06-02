@@ -1,6 +1,6 @@
 {
 	"name": "waris",
-	"version": "1.0.1",
+	"version": "1.0.3",
 	"description": "Islamic inheritance calculator (faraidh) and Indonesian number-to-words converter (terbilang) with BigInt precision",
 	"type": "module",
 	"main": "./dist/waris.umd.js",
@@ -71,7 +71,7 @@
 		"test:faraidh:basic": "bun test test/faraidh/faraidh.basic.test.ts",
 		"test:faraidh:advanced": "bun test test/faraidh/faraidh.advanced.test.ts",
 		"test:all": "bun test test/",
-		"test:complete": "bun test --timeout 30000",
+		"test:complete": "bun test test/ --timeout 30000",
 		"test:ci": "bun test --timeout 30000 --reporter junit",
 		"test:coverage": "bun test --coverage",
 		"test:silent": "bun test --bail 1",
@@ -90,6 +90,7 @@
 		"commit-ready": "echo '📋 Checking commit readiness...' && bun run pre-commit",
 		"size": "bun run build && bun run --shell \"du -sh dist/*\"",
 		"analyze": "bun run build && bunx vite-bundle-analyzer dist",
+		"update-version": "bun scripts/update-version-refs.js",
 		"release": "bun run build && npm publish",
 		"prepare": "husky"
 	},
